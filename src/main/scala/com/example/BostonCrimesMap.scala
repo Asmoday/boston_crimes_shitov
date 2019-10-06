@@ -34,7 +34,7 @@ object BostonCrimesMap extends App {
     .option("header", "true")
     .option("inferSchema", "true")
     .csv(offenseCodesFilePath)
-    .withColumn("CRIME_TYPE", substring_index($"NAME", "-", 1))
+    .withColumn("CRIME_TYPE", trim(substring_index($"NAME", "-", 1)))
     .as[OffenseCode]
 
 
