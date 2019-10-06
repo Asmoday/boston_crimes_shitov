@@ -41,13 +41,13 @@ object BostonCrimesMap extends App {
   val offense_codes_br = spark.sparkContext.broadcast(offense_codes)
 
   val filteredCrimes = crimes
-    .filter($"DISTRICT".isNotNull)
+    .filter($"DISTRICT".isNotNull).cache()
 
   val crimesWithOffenceCodes = filteredCrimes
     .join(offense_codes_br.value, filteredCrimes("OFFENSE_CODE") === offense_codes_br.value("CODE"))
     .select("INCIDENT_NUMBER", "DISTRICT", "MONTH", "Lat", "Long", "CRIME_TYPE").cache()
 
-  val crimesDistrictAnalytics = filteredCrimes
+  val crimesDistrictAnalytics = crimes
     .groupBy($"DISTRICT")
     .agg(expr("COUNT(INCIDENT_NUMBER) as crimes_total"),
       expr("AVG(Lat) as lat"),
@@ -55,14 +55,14 @@ object BostonCrimesMap extends App {
     )
 
 
-  val crimesByDistrictByMonth = crimesWithOffenceCodes
+  val crimesByDistrictByMonth = crimes
     .groupBy($"DISTRICT", $"MONTH")
     .agg(expr("count(INCIDENT_NUMBER) as CRIMES_CNT")).createOrReplaceTempView("crimesByDistrictByMonth")
 
   val crimesDistrictMedian = spark.sql(
     "select " +
       " DISTRICT" +
-      " ,percentile_approx(CRIMES_CNT, 0.5) as crimes_monthly " +
+      " ,percentile(CRIMES_CNT, 0.5) as crimes_monthly " +
       " from crimesByDistrictByMonth" +
       " group by DISTRICT")
 
