@@ -47,7 +47,7 @@ object BostonCrimesMap extends App {
     .join(offense_codes_br.value, filteredCrimes("OFFENSE_CODE") === offense_codes_br.value("CODE"))
     .select("INCIDENT_NUMBER", "DISTRICT", "MONTH", "Lat", "Long", "CRIME_TYPE").cache()
 
-  val crimesDistrictAnalytics = crimes
+  val crimesDistrictAnalytics = filteredCrimes
     .groupBy($"DISTRICT")
     .agg(expr("COUNT(INCIDENT_NUMBER) as crimes_total"),
       expr("AVG(Lat) as lat"),
@@ -55,7 +55,7 @@ object BostonCrimesMap extends App {
     )
 
 
-  val crimesByDistrictByMonth = crimes
+  val crimesByDistrictByMonth = filteredCrimes
     .groupBy($"DISTRICT", $"MONTH")
     .agg(expr("count(INCIDENT_NUMBER) as CRIMES_CNT")).createOrReplaceTempView("crimesByDistrictByMonth")
 
