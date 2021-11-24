@@ -2,7 +2,11 @@ addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "0.8.0")
 
 resolvers += "sonatype-releases" at "https://oss.sonatype.org/content/repositories/releases/"
 
-resolvers += "Spark Package Main Repo" at "https://dl.bintray.com/spark-packages/maven"
+resolvers += "spark-packages" at "https://repos.spark-packages.org/"
+
+resolvers += "Maven Central Server" at "https://repo1.maven.org/maven2"
+
+resolvers += Resolver.typesafeRepo("releases")
 
 addSbtPlugin("org.spark-packages" % "sbt-spark-package" % "0.2.5")
 
